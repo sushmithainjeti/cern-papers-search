@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENSEARCH_URL=http://opensearch:9200
+    depends_on:
+      - opensearch
+
+  opensearch:
+    image: opensearchproject/opensearch:2.17.1
+    environment:
+      - discovery.type=single-node
+      - DISABLE_SECURITY_PLUGIN=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9201:9200"
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+
+volumes:
+  opensearch-data:

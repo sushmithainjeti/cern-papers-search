@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CERN Papers Search</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f0fafa;
+            --surface: #ffffff;
+            --border: #b2dfdb;
+            --accent: #00897b;
+            --accent2: #00695c;
+            --text: #1a2e2e;
+            --muted: #78909c;
+            --card-bg: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Syne', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(0,137,123,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(0,105,92,0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                linear-gradient(rgba(0,137,123,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,137,123,0.06) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        header {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 3rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(240,250,250,0.85);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            animation: spin 8s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .header-meta {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--muted);
+            text-align: right;
+            line-height: 1.6;
+        }
+
+        .header-meta span { color: var(--accent); }
+
+        .hero {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 5rem 2rem 3rem;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            color: var(--accent);
+            text-transform: uppercase;
+            border: 1px solid rgba(0,137,123,0.3);
+            padding: 0.3rem 1rem;
+            border-radius: 2px;
+            margin-bottom: 1.5rem;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 800;
+            line-height: 1.05;
+            margin-bottom: 1rem;
+            color: var(--text);
+            animation: fadeInUp 0.7s ease;
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            color: var(--muted);
+            font-size: 1rem;
+            max-width: 500px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .search-container {
+            position: relative;
+            z-index: 10;
+            max-width: 700px;
+            margin: 0 auto 1.5rem;
+            padding: 0 2rem;
+            animation: fadeInUp 0.9s ease;
+        }
+
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            background: var(--card-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            transition: border-color 0.3s;
+            box-shadow: 0 4px 20px rgba(0,137,123,0.08);
+        }
+
+        .search-wrapper:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0,137,123,0.12);
+        }
+
+        .search-prefix {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent);
+            padding: 0 1rem;
+            border-right: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .search-wrapper input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            padding: 1rem 1.2rem;
+        }
+
+        .search-wrapper input::placeholder { color: var(--muted); }
+
+        .search-wrapper button {
+            background: var(--accent);
+            border: none;
+            color: #ffffff;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-transform: uppercase;
+        }
+
+        .search-wrapper button:hover { background: var(--accent2); }
+
+        .quick-searches {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 0 2rem 3rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .quick-searches span {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--muted);
+            margin-right: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .quick-tag {
+            display: inline-block;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            border: 1px solid rgba(0,137,123,0.25);
+            padding: 0.25rem 0.75rem;
+            border-radius: 2px;
+            margin: 0.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            background: rgba(0,137,123,0.04);
+        }
+
+        .quick-tag:hover {
+            background: rgba(0,137,123,0.12);
+            border-color: var(--accent);
+        }
+
+        .stats-bar {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,0.6);
+            margin-bottom: 3rem;
+        }
+
+        .stat { text-align: center; }
+
+        .stat-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.2rem;
+        }
+
+        .results-section {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .results-count {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .results-count strong { color: var(--accent); }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .paper-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            animation: fadeInUp 0.5s ease both;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,137,123,0.06);
+            height: 100%;
+        }
+
+        .paper-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .paper-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,137,123,0.12);
+        }
+
+        .paper-card:hover::before { opacity: 1; }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .year-badge {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            border: 1px solid rgba(0,137,123,0.3);
+            padding: 0.2rem 0.6rem;
+            border-radius: 2px;
+            background: rgba(0,137,123,0.06);
+        }
+
+        .card-index {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--muted);
+        }
+
+        .paper-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+
+        .authors {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .author {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--accent2);
+            background: rgba(0,137,123,0.08);
+            border: 1px solid rgba(0,137,123,0.2);
+            padding: 0.15rem 0.5rem;
+            border-radius: 2px;
+        }
+
+        .et-al {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--muted);
+            padding: 0.15rem 0;
+        }
+
+        .abstract {
+            font-size: 0.82rem;
+            color: var(--muted);
+            line-height: 1.6;
+            border-top: 1px solid var(--border);
+            padding-top: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .empty-state {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 6rem 2rem;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.4;
+        }
+
+        .empty-state h3 {
+            font-size: 1.2rem;
+            color: var(--muted);
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: #aab;
+        }
+
+        footer {
+            position: relative;
+            z-index: 10;
+            border-top: 1px solid var(--border);
+            padding: 2rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.6);
+        }
+
+        .footer-left {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--muted);
+            line-height: 1.8;
+        }
+
+        .footer-left a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .footer-left a:hover { text-decoration: underline; }
+
+        .footer-right {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--muted);
+            text-align: right;
+            line-height: 1.8;
+        }
+
+        .sort-select {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 0.3rem 0.6rem;
+            border-radius: 3px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .sort-select:hover { border-color: var(--accent); }
+
+        a.card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .paper-card:nth-child(1) { animation-delay: 0.05s; }
+        .paper-card:nth-child(2) { animation-delay: 0.1s; }
+        .paper-card:nth-child(3) { animation-delay: 0.15s; }
+        .paper-card:nth-child(4) { animation-delay: 0.2s; }
+        .paper-card:nth-child(5) { animation-delay: 0.25s; }
+        .paper-card:nth-child(6) { animation-delay: 0.3s; }
+
+        @media (max-width: 768px) {
+            header { padding: 1rem 1.5rem; }
+            .hero { padding: 3rem 1.5rem 2rem; }
+            .results-grid { grid-template-columns: 1fr; }
+            .stats-bar { gap: 1.5rem; }
+            footer { flex-direction: column; gap: 1rem; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <div class="logo-icon">⚛</div>
+            CERN // Papers Search
+        </div>
+        <div class="header-meta">
+            <div>Data source: <span>Inspire-HEP API</span></div>
+            <div>Domain: <span>High Energy Physics</span></div>
+        </div>
+    </header>
+
+    <div class="hero">
+        <div class="hero-tag">⚡ Live — Powered by Inspire-HEP</div>
+        <h1>Search <span class="highlight">Physics</span><br>Research Papers</h1>
+        <p>Access millions of high energy physics papers directly from CERN's Inspire-HEP database. Real-time search across titles, authors, and abstracts.</p>
+    </div>
+
+    <div class="search-container">
+        <form action="/search" method="get">
+            <div class="search-wrapper">
+                <div class="search-prefix">query://</div>
+                <input
+                    type="text"
+                    name="q"
+                    placeholder="Higgs Boson, Dark Matter, LHC collisions..."
+                    value="{{ query }}"
+                    autofocus
+                >
+                <button type="submit">Search →</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="quick-searches">
+        <span>Try:</span>
+        <a class="quick-tag" href="/search?q=Higgs+Boson">Higgs Boson</a>
+        <a class="quick-tag" href="/search?q=Dark+Matter">Dark Matter</a>
+        <a class="quick-tag" href="/search?q=LHC">LHC</a>
+        <a class="quick-tag" href="/search?q=Quantum+Field+Theory">Quantum Field Theory</a>
+        <a class="quick-tag" href="/search?q=Gravitational+Waves">Gravitational Waves</a>
+        <a class="quick-tag" href="/search?q=Supersymmetry">Supersymmetry</a>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-value">2M+</div>
+            <div class="stat-label">Papers Indexed</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">LIVE</div>
+            <div class="stat-label">API Status</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">HEP</div>
+            <div class="stat-label">Domain</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">REST</div>
+            <div class="stat-label">Architecture</div>
+        </div>
+    </div>
+
+    <div class="results-section">
+        {% if papers %}
+        <div class="results-header">
+            <div class="results-count">
+                Showing <strong>{{ papers|length }}</strong> results for <strong>"{{ query }}"</strong>
+            </div>
+            <form method="get" action="/search">
+                <input type="hidden" name="q" value="{{ query }}">
+                <select name="sort" class="sort-select" onchange="this.form.submit()">
+                    <option value="mostrecent" {% if sort == 'mostrecent' %}selected{% endif %}>Most Recent</option>
+                    <option value="mostcited" {% if sort == 'mostcited' %}selected{% endif %}>Most Cited</option>
+                </select>
+            </form>
+        </div>
+        <div class="results-grid">
+            {% for paper in papers %}
+            {% if paper.link %}
+            <a href="{{ paper.link }}" target="_blank" class="card-link">
+            {% endif %}
+            <div class="paper-card">
+                <div class="card-top">
+                    <span class="year-badge">{{ paper.year }}</span>
+                    <span class="card-index">#{{ loop.index }}</span>
+                </div>
+                <div class="paper-title">{{ paper.title }}</div>
+                <div class="authors">
+                    {% for author in paper.authors %}
+                    <span class="author">{{ author }}</span>
+                    {% endfor %}
+                    {% if paper.authors|length == 3 %}
+                    <span class="et-al">et al.</span>
+                    {% endif %}
+                </div>
+                <div class="abstract">
+                    {{ paper.abstract[:300] }}{% if paper.abstract|length > 300 %}...{% endif %}
+                </div>
+            </div>
+            {% if paper.link %}
+            </a>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% elif query %}
+        <div class="empty-state">
+            <div class="empty-icon">🔭</div>
+            <h3>No results found for "{{ query }}"</h3>
+            <p>Try a different search term</p>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">⚛️</div>
+            <h3>Enter a query to search CERN research papers</h3>
+            <p>Searching across titles · abstracts · authors · experiments</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <footer>
+        <div class="footer-left">
+            <div>Data: <a href="https://inspirehep.net" target="_blank">Inspire-HEP</a> — CERN's official HEP database</div>
+            <div>Built with FastAPI · OpenSearch · Jinja2 · Docker · Kubernetes</div>
+        </div>
+        <div class="footer-right" style="display: flex; gap: 1.2rem; align-items: center;">
+            <a href="mailto:sushmithainjeti529@gmail.com" title="Email" style="color: var(--accent); text-decoration: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            </a>
+            <a href="https://www.linkedin.com/in/sushmitha-injeti-123476284/" target="_blank" title="LinkedIn" style="color: var(--accent); text-decoration: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="https://github.com/sushmithainjeti" target="_blank" title="GitHub" style="color: var(--accent); text-decoration: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.929.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+        </div>
+    </footer>
+
+</body>
+</html>
