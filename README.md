@@ -65,7 +65,7 @@ cern-papers-search/
 - docker-compose.yml      # Multi-container setup
 - k8s/                    # Kubernetes manifests
 - requirements.txt        # Python dependencies   
--.github/workflows/       # GitHub Actions CI/CD
+- .github/workflows/       # GitHub Actions CI/CD
 
 ---
 
