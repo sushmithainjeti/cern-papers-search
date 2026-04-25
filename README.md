@@ -2,10 +2,6 @@
 
 A production-ready, full-stack search engine for high energy physics research papers, powered by CERN's official Inspire-HEP API. Built to demonstrate real-world skills in Python backend development, search engine integration, containerization, and cloud-native deployment.
 
----
-
-## 🌐 Live Demo
-Coming soon — deploying on Koyeb
 
 ---
 
