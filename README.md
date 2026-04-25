@@ -97,7 +97,7 @@ This aligns directly with CERN's open science mission and demonstrates practical
 ## 👩‍💻 Author
 
 Sushmitha Injeti
-📧 sushmithainjeti529@gmail.com
+mail: sushmithainjeti529@gmail.com
 
 ---
 
