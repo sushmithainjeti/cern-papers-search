@@ -11,7 +11,7 @@ Coming soon — deploying on Koyeb
 
 ## 📌 What It Does
 
-Type any physics topic — Higgs Boson, Dark Matter, LHC, Gravitational Waves — and instantly get the most recent or most cited research papers from CERN's official database.
+Type any physics topic - Higgs Boson, Dark Matter, LHC, Gravitational Waves and instantly get the most recent or most cited research papers from CERN's official database.
 
 Each result shows:
 - Full paper title
@@ -57,15 +57,15 @@ Open http://localhost:8000
 ## 📁 Project Structure
 
 cern-papers-search/
-├── main.py                 # FastAPI app
-├── templates/
-│   └── index.html          # Jinja2 HTML template
-├── static/                 # Static assets
-├── Dockerfile              # Container definition
-├── docker-compose.yml      # Multi-container setup
-├── k8s/                    # Kubernetes manifests
-├── requirements.txt        # Python dependencies
-└── .github/workflows/      # GitHub Actions CI/CD
+- main.py                 # FastAPI app
+-templates/
+- index.html              # Jinja2 HTML template
+- static/                 # Static assets
+- Dockerfile              # Container definition
+- docker-compose.yml      # Multi-container setup
+- k8s/                    # Kubernetes manifests
+- requirements.txt        # Python dependencies   
+-.github/workflows/       # GitHub Actions CI/CD
 
 ---
 
