@@ -97,16 +97,19 @@ mail: sushmithainjeti529@gmail.com
 
 ---
 
-## 📄 License
-
-MIT License
 
 ## 📊 Monitoring
-- **Prometheus:** http://localhost:9090 — scrapes app metrics every 15s
-- **Grafana:** http://localhost:3000 — visualize request counts and response times
+- **Prometheus:** http://localhost:9090 - scrapes app metrics every 15s
+- **Grafana:** http://localhost:3000 - visualize request counts and response times
 
 ## ☸️ Kubernetes Deployment
 ```bash
 kubectl apply -f k8s/
 ```
 Includes Deployment (2 replicas), Service (LoadBalancer), and ConfigMap — ready for OpenShift deployment.
+
+---
+
+## Licence
+
+MIT Licence.
