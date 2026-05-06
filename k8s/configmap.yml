@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cern-search-config
+data:
+  OPENSEARCH_URL: "http://opensearch:9200"
+  APP_PORT: "8000"

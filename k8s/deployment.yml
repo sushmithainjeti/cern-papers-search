@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cern-search
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cern-search
+  template:
+    metadata:
+      labels:
+        app: cern-search
+    spec:
+      containers:
+      - name: cern-search
+        image: sushmithainjeti/cern-papers-search:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: OPENSEARCH_URL
+          value: "http://opensearch:9200"
