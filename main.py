@@ -2,10 +2,13 @@ from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
+from prometheus_fastapi_instrumentator import Instrumentator
 import httpx
 import re
 
 app = FastAPI()
+
+Instrumentator().instrument(app).expose(app)
 
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -31,11 +34,9 @@ async def search(request: Request, q: str = "", sort: str = "mostrecent"):
             for hit in data.get("hits", {}).get("hits", []):
                 meta = hit.get("metadata", {})
 
-                # Get arxiv link
                 arxiv = meta.get("arxiv_eprints", [{}])[0].get("value", "")
                 link = f"https://arxiv.org/abs/{arxiv}" if arxiv else ""
 
-                # Get year — try publication_info first, then earliest_date
                 year = ""
                 pub_info = meta.get("publication_info", [])
                 if pub_info and pub_info[0].get("year"):
@@ -46,7 +47,6 @@ async def search(request: Request, q: str = "", sort: str = "mostrecent"):
                 if not year:
                     year = "N/A"
 
-                # Clean abstract of HTML tags
                 raw_abstract = meta.get("abstracts", [{}])[0].get("value", "No abstract available")
                 clean_abstract = re.sub(r'<[^>]+>', '', raw_abstract)
 
